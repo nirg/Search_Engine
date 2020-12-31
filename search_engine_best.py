@@ -6,11 +6,12 @@ from indexer import Indexer
 from searcher import Searcher
 import utils
 
+
 # DO NOT CHANGE THE CLASS NAME
 class SearchEngine:
 
     # DO NOT MODIFY THIS SIGNATURE
-    # You can change the internal implmentation, but you must have a parser and an indexer.
+    # You can change the internal implementation, but you must have a parser and an indexer.
     def __init__(self, config=None):
         self._config = config
         self._parser = Parse()
@@ -18,7 +19,7 @@ class SearchEngine:
         self._model = None
 
     # DO NOT MODIFY THIS SIGNATURE
-    # You can change the internal implmentation as you see fit.
+    # You can change the internal implementation as you see fit.
     def build_index_from_parquet(self, fn):
         """
         Reads parquet file and passes it to the parser, then indexer.
@@ -40,7 +41,7 @@ class SearchEngine:
         print('Finished parsing and indexing.')
 
     # DO NOT MODIFY THIS SIGNATURE
-    # You can change the internal implmentation as you see fit.
+    # You can change the internal implementation as you see fit.
     def load_index(self, fn):
         """
         Loads a pre-computed index (or indices) so we can answer queries.
@@ -50,7 +51,7 @@ class SearchEngine:
         self._indexer.load_index(fn)
 
     # DO NOT MODIFY THIS SIGNATURE
-    # You can change the internal implmentation as you see fit.
+    # You can change the internal implementation as you see fit.
     def load_precomputed_model(self):
         """
         Loads a pre-computed model (or models) so we can answer queries.
@@ -58,6 +59,9 @@ class SearchEngine:
         assign to self._model, which is passed on to the searcher at query time.
         """
         pass
+
+        # DO NOT MODIFY THIS SIGNATURE
+        # You can change the internal implementation as you see fit.
 
     def search(self, query):
         """ 

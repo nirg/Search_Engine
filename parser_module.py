@@ -21,7 +21,7 @@ class Parse:
     def parse_doc(self, doc_as_list):
         """
         This function takes a tweet document as list and break it into different fields
-        :param doc_as_list: list re-preseting the tweet.
+        :param doc_as_list: list re-presenting the tweet.
         :return: Document object with corresponding fields.
         """
         tweet_id = doc_as_list[0]

@@ -1,14 +1,14 @@
 # DO NOT MODIFY CLASS NAME
 class Indexer:
     # DO NOT MODIFY THIS SIGNATURE
-    # You can change the internal implmentation as you see fit.
+    # You can change the internal implementation as you see fit.
     def __init__(self, config):
         self.inverted_idx = {}
         self.postingDict = {}
         self.config = config
 
     # DO NOT MODIFY THIS SIGNATURE
-    # You can change the internal implmentation as you see fit.
+    # You can change the internal implementation as you see fit.
     def add_new_doc(self, document):
         """
         This function perform indexing process for a document object.
@@ -34,7 +34,7 @@ class Indexer:
                 print('problem with the following key {}'.format(term[0]))
 
     # DO NOT MODIFY THIS SIGNATURE
-    # You can change the internal implmentation as you see fit.
+    # You can change the internal implementation as you see fit.
     def load_index(self, fn):
         """
         Loads a pre-computed index (or indices) so we can answer queries.
@@ -43,7 +43,17 @@ class Indexer:
         """
         raise NotImplementedError
 
-    # feel free to change the signature and/or implmentation of this function 
+    # DO NOT MODIFY THIS SIGNATURE
+    # You can change the internal implementation as you see fit.
+    def save_index(self, fn):
+        """
+        Saves a pre-computed index (or indices) so we can save our work.
+        Input:
+              fn - file name of pickled index.
+        """
+        raise NotImplementedError
+
+    # feel free to change the signature and/or implementation of this function 
     # or drop altogether.
     def _is_term_exist(self, term):
         """
@@ -51,7 +61,7 @@ class Indexer:
         """
         return term in self.postingDict
 
-    # feel free to change the signature and/or implmentation of this function 
+    # feel free to change the signature and/or implementation of this function 
     # or drop altogether.
     def get_term_posting_list(self, term):
         """
