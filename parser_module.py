@@ -6,7 +6,7 @@ from document import Document
 class Parse:
 
     def __init__(self):
-        self.stop_words = stopwords.words('english')
+        self.stop_words = frozenset(stopwords.words('english'))
 
     def parse_sentence(self, text):
         """
