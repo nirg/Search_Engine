@@ -27,7 +27,7 @@ def recall_single(df, num_of_relevant, query_number):
         :param query_number: Integer/None that tell on what query_number to evaluate precision or None for the entire DataFrame
         :return: Double - The recall
     """
-    df2 = df[df['query'] == query_number][:num_of_relevant]
+    df2 = df[df['query'] == query_number]
     return df2['y_true'].sum() / num_of_relevant
 
 
@@ -70,7 +70,8 @@ def map(df):
     acc = 0
     split_df = [pd.DataFrame(y).reset_index() for x, y in df.groupby('query', as_index=True)]
     indices = [sdf.index[sdf['y_true'] == 1].tolist() for sdf in split_df]
-    for indexes, i in zip(indices, range(len(split_df))):
+    for i, indexes in enumerate(indices):
         pres = [precision_at_n(split_df[i], i + 1, index + 1) for index in indexes]
         acc += reduce(lambda a, b: a + b, pres) / len(indexes) if len(pres) > 0 else 0
     return acc / len(split_df)
+    

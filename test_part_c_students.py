@@ -50,6 +50,7 @@ if __name__ == '__main__':
         else:
             bench_lbls = pd.read_csv(bench_lbls_path,
                                      dtype={'query': int, 'tweet': str, 'y_true': int})
+            logging.info("Successfully loaded benchmark labels data.")
 
         # is queries file under data?
         queries = None
@@ -57,6 +58,7 @@ if __name__ == '__main__':
             logging.error("Queries data not found ~> skipping some tests.")
         else:
             queries = pd.read_csv(os.path.join('data', 'queries_train.tsv'), sep='\t')
+            logging.info("Successfully loaded queries data.")
 
         # test for each search engine module
         engine_modules = ['search_engine_' + name for name in ['1', '2', 'best']]
@@ -67,6 +69,7 @@ if __name__ == '__main__':
                     continue
                 # try importing the module
                 se = importlib.import_module(engine_module)
+                logging.info(f"Successfully imported module {engine_module}.")
                 engine = se.SearchEngine()
 
                 # test building an index and doing so in <1 minute
@@ -74,6 +77,7 @@ if __name__ == '__main__':
                     "engine.build_index_from_parquet(bench_data_path)",
                     globals=globals(), number=1
                 )
+                logging.debug(f"Building the index in {engine_module} for benchmark data took {build_idx_time} seconds.")
                 if build_idx_time > 60:
                     logging.error('Parsing and index our *small* benchmark dataset took over a minute!')
                 # test loading precomputed model
@@ -84,6 +88,7 @@ if __name__ == '__main__':
                 if n_res is None or res is None or n_res < 1 or len(res) < 1:
                     logging.error('basic query for the word bioweapon returned no results')
                 else:
+                    logging.debug(f"{engine_module} successfully returned {n_res} results for the query 'bioweapon'.")
                     invalid_tweet_ids = [doc_id for doc_id in res if invalid_tweet_id(doc_id)]
                     if len(invalid_tweet_ids) > 0:
                         logging.error("the query 'bioweapon' returned results that are not valid tweet ids: " + str(
@@ -102,6 +107,7 @@ if __name__ == '__main__':
                         if q_n_res is None or q_res is None or q_n_res < 1 or len(q_res) < 1:
                             logging.error(f"Query {q_id} with keywords '{q_keywords}' returned no results.")
                         else:
+                            logging.debug(f"{engine_module} successfully returned {q_n_res} results for query number {q_id}.")
                             invalid_tweet_ids = [doc_id for doc_id in q_res if invalid_tweet_id(doc_id)]
                             if len(invalid_tweet_ids) > 0:
                                 logging.error(f"Query  {q_id} returned results that are not valid tweet ids: " + str(
@@ -116,14 +122,16 @@ if __name__ == '__main__':
                 q_results_labeled = None
                 if bench_lbls is not None and len(queries_results) > 0:
                     q_results_labeled = pd.merge(queries_results, bench_lbls,
-                                                 on=['query', 'tweet'], how='left', suffixes=('_result', '_bench'))
-                    q_results_labeled.rename(columns={'y_true': 'label'})
+                                                 on=['query', 'tweet'], how='inner', suffixes=('_result', '_bench'))
+                    # q_results_labeled.rename(columns={'y_true': 'label'})
 
                 # test that MAP > 0
                 if q_results_labeled is not None:
+                    # logging.debug(q_results_labeled.head())
                     results_map = metrics.map(q_results_labeled)
+                    logging.debug(f"{engine_module} results have MAP value of {results_map}.")
                     if results_map <= 0 or results_map > 1:
-                        logging.error(f'Search results MAP value out of range: {results_map}.')
+                        logging.error(f'{engine_module} results MAP value is out of range (0,1).')
 
                 # test that the average across queries of precision, 
                 # precision@5, precision@10, precision@50, and recall 
@@ -131,8 +139,9 @@ if __name__ == '__main__':
 
                 if engine_module == 'search_engine_best' and \
                         test_file_exists('idx_bench.pkl'):
-                    logging.debug('idx_bench.pkl found!')
+                    logging.info('idx_bench.pkl found!')
                     engine.load_index('idx_bench.pkl')
+                    logging.info('Successfully loaded idx_bench.pkl using search_engine_best.')
 
             except Exception as e:
                 logging.error(f'The following error occured while testing the module {engine_module}.')
