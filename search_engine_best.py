@@ -40,6 +40,23 @@ class SearchEngine:
             self._indexer.add_new_doc(parsed_document)
         print('Finished parsing and indexing.')
 
+
+
+       # for i in range(len(doc_list)):
+       #     tmp_list = r.read_file(file_name=doc_list[i])
+       #     for idx, document in enumerate(tmp_list):
+       #         number_of_documents += 1
+       #         parsed_document = p.parse_doc(document, stemming)
+       #         if (number_of_documents % 1000000 == 0):
+       #             p.get_entity_dict()
+       #             indexer.update_index_data(p.get_global_dict(), p.get_posting_dict())
+       # if (len(p.global_dict) > 0):
+       #     p.get_entity_dict()
+       #     indexer.update_index_data(p.get_global_dict(), p.get_posting_dict())
+       # indexer.merge_all_posts_dict()
+
+
+
     # DO NOT MODIFY THIS SIGNATURE
     # You can change the internal implementation as you see fit.
     def load_index(self, fn):
@@ -76,3 +93,6 @@ class SearchEngine:
         """
         searcher = Searcher(self._parser, self._indexer, model=self._model)
         return searcher.search(query)
+def main():
+    engine=SearchEngine()
+    engine.build_index_from_parquet(r'C:\Users\adirm\Downloads\data\benchmark_data_train.snappy.parquet')
