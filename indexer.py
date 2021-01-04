@@ -1,4 +1,7 @@
 # DO NOT MODIFY CLASS NAME
+import pickle
+
+
 class Indexer:
     # DO NOT MODIFY THIS SIGNATURE
     # You can change the internal implementation as you see fit.
@@ -6,7 +9,7 @@ class Indexer:
         self.inverted_idx = {}
         self.postingDict = {}
         self.config = config
-        self.docs={}  # docs["2343211"]={"banana:tf_val,'apple':tf,val,'orange':tf_val,.....}
+        self.postingDocs={}  # docs["2343211"]={"banana:tf_val,'apple':tf,val,'orange':tf_val,.....}
 
     # DO NOT MODIFY THIS SIGNATURE
     # You can change the internal implementation as you see fit.
@@ -42,18 +45,28 @@ class Indexer:
         Input:
             fn - file name of pickled index.
         """
-        path=self.config.savedFileMainFolder
+        #pkl object ->[inverted_idx,posting_data,posting_document]
+        file = open(self.config.savedFileMainFolder+"\\"+fn, 'rb')
+        object_file = pickle.load(file)
+        return object_file
 
 
     # DO NOT MODIFY THIS SIGNATURE
     # You can change the internal implementation as you see fit.
     def save_index(self, fn):
         """
+        pkl object ->[inverted_idx,posting_data,posting_document]
+
         Saves a pre-computed index (or indices) so we can save our work.
         Input:
               fn - file name of pickled index.
         """
-        raise NotImplementedError
+        #
+        path=self.config.savedFileMainFolder
+        dict_lst=[self.inverted_idx,self.postingDict,self.postingDocs]
+        with open(path+"\\"+fn, 'wb') as f:
+            pickle.dump(dict_lst, f)
+        f.close()
 
     # feel free to change the signature and/or implementation of this function 
     # or drop altogether.
@@ -61,6 +74,7 @@ class Indexer:
         """
         Checks if a term exist in the dictionary.
         """
+
         return term in self.postingDict
 
     # feel free to change the signature and/or implementation of this function 
@@ -88,12 +102,13 @@ class Indexer:
               self.postingDict[term].append([tweet_id, term_dict[term] , tf ,len(term_dict),tweet_date])
 
     def update_docs_dict(self,tweet_id,document_dictionary):
-        if(tweet_id in self.docs):
+
+        if(tweet_id in self.postingDocs):
             return
         local_tf_dict={} #this dictionary hold "term" and the tf value in this specific doc
         max_freq = max(document_dictionary.values())
         for term in document_dictionary:
             local_tf_dict[term]=document_dictionary[term] / max_freq
-        self.docs[tweet_id]=local_tf_dict
+        self.postingDocs[tweet_id]=local_tf_dict
 
 
