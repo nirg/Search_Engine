@@ -9,7 +9,7 @@ class Indexer:
         self.inverted_idx = {}
         self.postingDict = {}
         self.config = config
-        self.postingDocs={}  # docs["2343211"]={"banana:tf_val,'apple':tf,val,'orange':tf_val,.....}
+        self.postingDocs={}  # docs["2343211"]=[(term , tf),(),....]
 
     # DO NOT MODIFY THIS SIGNATURE
     # You can change the internal implementation as you see fit.
@@ -46,7 +46,13 @@ class Indexer:
             fn - file name of pickled index.
         """
         #pkl object ->[inverted_idx,posting_data,posting_document]
-        file = open(self.config.savedFileMainFolder+"\\"+fn, 'rb')
+        path = "saved_data\\" + "WithoutStem\\" + fn + ".pickle"
+        try:
+            if self.config.toStem:
+                path = "saved_data\\" + "WithStem\\" + fn + ".pickle"
+        except:
+            pass
+        file = open(path, 'rb')
         object_file = pickle.load(file)
         return object_file
 
@@ -62,20 +68,32 @@ class Indexer:
               fn - file name of pickled index.
         """
         #
-        path=self.config.savedFileMainFolder
+        path = "saved_data\\" + "WithoutStem\\" + fn + ".pickle"
+        try:
+            if self.config.toStem:
+                path = "saved_data\\" + "WithStem\\" + fn + ".pickle"
+        except:
+            pass
         dict_lst=[self.inverted_idx,self.postingDict,self.postingDocs]
-        with open(path+"\\"+fn, 'wb') as f:
-            pickle.dump(dict_lst, f)
+        with open(path, 'wb') as f:
+            pickle.dump(dict_lst, f,protocol=pickle.HIGHEST_PROTOCOL)
         f.close()
 
     # feel free to change the signature and/or implementation of this function 
     # or drop altogether.
-    def _is_term_exist(self, term):
+    def _is_term_exist_post(self, term):
         """
         Checks if a term exist in the dictionary.
         """
 
         return term in self.postingDict
+
+    def _is_term_exist_inv(self, term):
+        """
+        Checks if a term exist in the dictionary.
+        """
+
+        return term in self.inverted_idx
 
     # feel free to change the signature and/or implementation of this function 
     # or drop altogether.
@@ -83,7 +101,14 @@ class Indexer:
         """
         Return the posting list from the index for a term.
         """
-        return self.postingDict[term] if self._is_term_exist(term) else []
+        return self.postingDict[term] if self._is_term_exist_post(term) else []
+
+    def get_num_of_term_in_docs(self, term):
+        """
+        Return the number of show of term in all document.
+        """
+
+        return self.inverted_idx[term] if self._is_term_exist_inv(term) else 0
 
     def update_post_dict(self, tweet_id,tweet_date,term_dict,term):
           """
@@ -105,10 +130,14 @@ class Indexer:
 
         if(tweet_id in self.postingDocs):
             return
-        local_tf_dict={} #this dictionary hold "term" and the tf value in this specific doc
+        local_tf_dict=[] #this dictionary hold "term" and the tf value in this specific doc
         max_freq = max(document_dictionary.values())
         for term in document_dictionary:
-            local_tf_dict[term]=document_dictionary[term] / max_freq
+            local_tf_dict.append((term,document_dictionary[term] / max_freq)) #(term, tf)
         self.postingDocs[tweet_id]=local_tf_dict
+
+    def get_docs_dict(self):
+        return self.postingDocs
+
 
 

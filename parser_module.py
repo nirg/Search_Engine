@@ -12,14 +12,20 @@ class Parse:
     The term parsing comes from Latin pars
     """
 
-    def __init__(self):
+    def __init__(self,config=None):
         self.tmp_for_entites = {}
-        self.stop_words = stopwords.words('english') + ['?', '!', ',', '+', '-', '*', '/', '"', '.', '<', '>', '=', ':','','{','{}','}','[',']','[]','are','and','an','at','am','a','even','every','everyone']
+        self.stop_words = stopwords.words('english') + ['?', '!', ',', '+', '-', '*', '/', '"', '.', '<', '>', '=', ':','','{','{}','}','[',']','[]','are','and','an','at','am','a','even','every','everyone','rt','RT']
         self.global_dict = {}  #value=number of docs
         self.post_dict = {}  # key="word",value=[parquet name,index in parquet,tweet id,frequency in tweet,location in tweet,tf]
         self.entities = {}
+        self.config=config
 
-    def parse_doc(self, doc_as_list,with_stem=False):
+    def parse_sentence(self, sentence):
+        if (sentence == None):
+            return
+        return self.tokenized_parse(sentence)
+
+    def parse_doc(self, doc_as_list):
         """
         This function takes a tweet document as list and break it into different fields
         :param doc_as_list: list re-preseting the tweet.
@@ -39,10 +45,13 @@ class Parse:
         term_dict = {}
         url = self.parse_url(url)
         tokenized_text=self.tokenized_parse(full_text)+url
-
-        if with_stem:
-            stem=Stemmer()
-            tokenized_text=stem.stem_term(tokenized_text)
+        try:
+            if self.config.toStem:
+                stem=Stemmer()
+                for i in range(len(tokenized_text)):
+                    tokenized_text[i]=stem.stem_term(tokenized_text[i])
+        except:
+            pass
 
         doc_length = len(tokenized_text)  # after text operations.
         unique_words=set()
@@ -51,22 +60,7 @@ class Parse:
                 continue
             unique_words.add(tokenized_text[i])
             term_dict = self.update_doc_dict(term_dict, tokenized_text[i].lower())
-            #if tokenized_text[i].lower() not in local_dict:
-            #    local_dict[tokenized_text[i].lower()]=[1,[i]]
-            #else:
-            #    local_dict[tokenized_text[i].lower()][0]+=1
-            #    local_dict[tokenized_text[i].lower()][1].append(i)
-       # if term_dict=={}:
-       #     return False
 
-        #for term in unique_words:
-        #   if term[0].isupper():
-        #       term=term.upper()
-        #   else:
-        #       term=term.lower()
-        #   self.update_global_dict(term)
-       # self.update_post_dict(tweet_id,local_dict,term_dict,tweet_date)
-        #self.update_entity_global_dict()
         document = Document(tweet_id, tweet_date, full_text, url, retweet_text, retweet_url, quote_text,
                             quote_url, term_dict, doc_length)
         return document
@@ -449,7 +443,7 @@ class Parse:
               :param sentence:  thw sentece we look up for currency show
               :return:same sentence with extends, $-->$,usd,us dollar .
               """
-
+        t=term.upper()
         currency_dict = {
             'ALL': 'Albania Lek',
             'AFN': 'Afghanistan Afghani',
@@ -565,8 +559,8 @@ class Parse:
             'VND': 'Viet Nam Dong',
             'YER': 'Yemen Rial',
             'ZWD': 'Zimbabwe Dollar'}
-        if term in currency_dict:
-            return currency_dict[term]
+        if t in currency_dict:
+            return currency_dict[t]
         return term
 
     def update_post_dict(self, tweet_id, local_dict,term_dict,tweet_date):
@@ -674,10 +668,9 @@ class Parse:
             if '.' in i:
                 tokenized_text_copy[idx] = tokenized_text_copy[idx].replace(".", '')
             if ',' in i:
-                tokenized_text_copy[idx] = tokenized_text_copy[idx].replace(".", '')
+                tokenized_text_copy[idx] = tokenized_text_copy[idx].replace(",", '')
             tokenized_text_copy[idx]=self.extand_contractions(tokenized_text_copy[idx].lower())
-            tokenized_text_copy[idx]=self.currency_parse(tokenized_text_copy[idx].upper())
-
+            tokenized_text_copy[idx]=self.currency_parse(tokenized_text_copy[idx])
 
         tokenized_text=tokenized_text_copy
         # save #tag
