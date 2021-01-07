@@ -12,8 +12,6 @@ if __name__ == '__main__':
 
     logging.basicConfig(filename='part_c_tests.log', level=logging.DEBUG,
                         filemode='w', format='%(levelname)s %(asctime)s: %(message)s')
-    import metrics
-
 
     def test_file_exists(fn):
         if os.path.exists(fn):
@@ -40,6 +38,7 @@ if __name__ == '__main__':
 
     start = datetime.now()
     try:
+        import metrics
         # is the report there?
         test_file_exists('report_part_c.docx')
         # is benchmark data under 'data' folder?
@@ -47,7 +46,7 @@ if __name__ == '__main__':
         q2n_relevant = None
         if not test_file_exists(bench_data_path) or \
                 not test_file_exists(bench_lbls_path):
-            logging.error("Benchmark data does exist under the 'data' folder.")
+            logging.error("Benchmark data does not exist under the 'data' folder.")
             sys.exit(-1)
         else:
             bench_lbls = pd.read_csv(bench_lbls_path,
