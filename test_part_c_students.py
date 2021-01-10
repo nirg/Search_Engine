@@ -40,7 +40,7 @@ if __name__ == '__main__':
     try:
         import metrics
         # is the report there?
-        test_file_exists('report_part_c.docx')
+        # test_file_exists('report_part_c.docx')
         # is benchmark data under 'data' folder?
         bench_lbls = None
         q2n_relevant = None
@@ -183,11 +183,15 @@ if __name__ == '__main__':
                     if recall < 0 or recall > 1:
                         logging.error(f"The average recall for {engine_module} is out of range [0,1].")
 
-                if engine_module == 'search_engine_best' and \
-                        test_file_exists('idx_bench.pkl'):
-                    logging.info('idx_bench.pkl found!')
-                    engine.load_index('idx_bench.pkl')
-                    logging.info('Successfully loaded idx_bench.pkl using search_engine_best.')
+                if engine_module == 'search_engine_best':
+                    paths = ['idx_bench.pkl', os.path.join('model_dir', 'idx_bench.pkl')]
+                    idx_path = next((p for p in paths if os.path.exists(p)), None)
+                    if idx_path is not None:
+                        logging.info(f'{idx_path} found!')
+                        engine.load_index(idx_path)
+                        logging.info('Successfully loaded idx_bench.pkl using search_engine_best.')
+                    else:
+                        logging.error(f'idx_bench.pkl cannot be found in the current directory or under {model_dir}.')
 
             except Exception as e:
                 logging.error(f'The following error occured while testing the module {engine_module}.')
