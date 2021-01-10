@@ -184,7 +184,7 @@ if __name__ == '__main__':
                         logging.error(f"The average recall for {engine_module} is out of range [0,1].")
 
                 if engine_module == 'search_engine_best':
-                    paths = ['idx_bench.pkl', os.path.join('model_dir', 'idx_bench.pkl')]
+                    paths = ['idx_bench.pkl', os.path.join(model_dir, 'idx_bench.pkl')]
                     idx_path = next((p for p in paths if os.path.exists(p)), None)
                     if idx_path is not None:
                         logging.info(f'{idx_path} found!')
