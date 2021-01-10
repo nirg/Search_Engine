@@ -64,6 +64,8 @@ if __name__ == '__main__':
 
         import configuration
         config = configuration.ConfigClass()
+        if hasattr(config, 'model_dir'):
+            config.model_dir = model_dir
         
         # do we need to download a pretrained model?
         model_url = config.get_model_url()
@@ -78,8 +80,6 @@ if __name__ == '__main__':
                 logging.info(f'Successfully downloaded and extracted pretrained model into {model_dir}.')
             else:
                 logging.error('model.zip file does not exists.')
-            if hasattr(config, 'model_dir'):
-                config.model_dir = model_dir
 
         # test for each search engine module
         engine_modules = ['search_engine_' + name for name in ['1', '2', 'best']]
