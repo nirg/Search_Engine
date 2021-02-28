@@ -1,3 +1,4 @@
+
 class ConfigClass:
     def __init__(self):
         # link to a zip file in google drive with your pretrained model
@@ -37,4 +38,4 @@ class ConfigClass:
     @model_dir.setter 
     def model_dir(self, model_dir):
         self._model_dir = model_dir 
-        
+
