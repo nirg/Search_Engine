@@ -9,6 +9,7 @@ class Indexer:
         self.inverted_idx = {}
         self.postingDict = {}
         self.config = config
+        self.to_remove = []
         self.postingDocs={}  # docs["2343211"]=[(term , tf),(),....]
 
     # DO NOT MODIFY THIS SIGNATURE
@@ -23,7 +24,8 @@ class Indexer:
 
         document_dictionary = document.term_doc_dictionary
         # Go over each term in the doc
-        self.update_docs_dict(document.tweet_id,document_dictionary)
+        self.update_docs_dict(document.tweet_id,document_dictionary,document.doc_length)
+
         for term in document_dictionary.keys():
             try:
                 # Update inverted index and posting
@@ -126,18 +128,36 @@ class Indexer:
           else:
               self.postingDict[term].append([tweet_id, term_dict[term] , tf ,len(term_dict),tweet_date])
 
-    def update_docs_dict(self,tweet_id,document_dictionary):
+    def update_docs_dict(self,tweet_id,document_dictionary,doc_length):
 
         if(tweet_id in self.postingDocs):
             return
         local_tf_dict=[] #this dictionary hold "term" and the tf value in this specific doc
         max_freq = max(document_dictionary.values())
         for term in document_dictionary:
-            local_tf_dict.append((term,document_dictionary[term] / max_freq)) #(term, tf)
+            local_tf_dict.append((term,document_dictionary[term] / max_freq,doc_length)) #(term, tf,doc_length)
         self.postingDocs[tweet_id]=local_tf_dict
 
     def get_docs_dict(self):
         return self.postingDocs
+
+    def clean_rare_word_from_inverted_idx(self):
+
+        items = self.inverted_idx.items()
+        for tup in items:
+            if tup[1] < 2:
+                self.to_remove.append(tup[0])
+        for item in   self.to_remove:
+            self.inverted_idx.pop(item)
+
+    def clean_rare_word_from_posting(self):
+
+        for item in self.to_remove:
+            if item in self.postingDocs:
+                self.postingDocs.pop(item)
+            if item in self.postingDict:
+                self.postingDict.pop(item)
+        self.to_remove=[]
 
 
 

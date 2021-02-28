@@ -29,3 +29,11 @@ class ConfigClass:
 
     def get_download_model(self):
         return self._download_model
+
+    @property
+    def model_dir(self):
+        return self._model_dir
+
+    @model_dir.setter
+    def model_dir(self, model_dir):
+        self._model_dir = model_dir
