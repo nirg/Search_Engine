@@ -25,7 +25,7 @@ support of two ranks algorithms :
  * cosine similarity
 
 
-#technology
+# technology
 
 Based on python 3.7
 install ran.bat 
