@@ -81,7 +81,9 @@ class SearchEngine:
 
     # DO NOT MODIFY THIS SIGNATURE
     # You can change the internal implementation as you see fit.
-    def load_precomputed_model(self,model_dir=None):
+
+    def load_precomputed_model(self, model_dir=None):
+
         """
         Loads a pre-computed model (or models) so we can answer queries.
         This is where you would load models like word2vec, LSI, LDA, etc. and 
@@ -90,9 +92,8 @@ class SearchEngine:
         #self._model=Glove()
         pass
 
-        # DO NOT MODIFY THIS SIGNATURE
-        # You can change the internal implementation as you see fit.
-
+    # DO NOT MODIFY THIS SIGNATURE
+    # You can change the internal implementation as you see fit.
     def search(self, query):
         """ 
         Executes a query over an existing index and returns the number of 

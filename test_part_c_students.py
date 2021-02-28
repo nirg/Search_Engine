@@ -12,8 +12,6 @@ if __name__ == '__main__':
 
     logging.basicConfig(filename='part_c_tests.log', level=logging.DEBUG,
                         filemode='w', format='%(levelname)s %(asctime)s: %(message)s')
-    import metrics
-
 
     def test_file_exists(fn):
         if os.path.exists(fn):
@@ -40,14 +38,15 @@ if __name__ == '__main__':
 
     start = datetime.now()
     try:
+        import metrics
         # is the report there?
-        test_file_exists('report_part_c.docx')
+        # test_file_exists('report_part_c.docx')
         # is benchmark data under 'data' folder?
         bench_lbls = None
         q2n_relevant = None
         if not test_file_exists(bench_data_path) or \
                 not test_file_exists(bench_lbls_path):
-            logging.error("Benchmark data does exist under the 'data' folder.")
+            logging.error("Benchmark data does not exist under the 'data' folder.")
             sys.exit(-1)
         else:
             bench_lbls = pd.read_csv(bench_lbls_path,
@@ -66,6 +65,9 @@ if __name__ == '__main__':
         import configuration
 
         config = configuration.ConfigClass()
+        if hasattr(config, 'model_dir'):
+            config.model_dir = model_dir
+        
 
         # do we need to download a pretrained model?
         model_url = config.get_model_url()
@@ -151,8 +153,10 @@ if __name__ == '__main__':
                     zero_recall_qs = [q_id for q_id, rel in q2n_relevant.items() \
                                       if metrics.recall_single(q_results_labeled, rel, q_id) == 0]
                     if len(zero_recall_qs) > 0:
-                        logging.warning(
-                            f"{engine_module}'s recall for the following queries was zero {zero_recall_qs}.")
+
+                        logging.warning(f"{engine_module}'s recall for the following queries was zero {zero_recall_qs}.")
+
+                
 
                 if q_results_labeled is not None:
                     # test that MAP > 0
@@ -161,14 +165,16 @@ if __name__ == '__main__':
                     if results_map <= 0 or results_map > 1:
                         logging.error(f'{engine_module} results MAP value is out of range (0,1).')
 
-                    # test that the average across queries of precision,
-                    # precision@5, precision@10, precision@50, and recall
+
+                    # test that the average across queries of precision, 
+                    # precision@5, precision@10, precision@50, and recall 
                     # is in [0,1].
                     prec, p5, p10, p50, recall = \
-                        metrics.precision(q_results_labeled), \
-                        metrics.precision(q_results_labeled.groupby('query').head(5)), \
-                        metrics.precision(q_results_labeled.groupby('query').head(10)), \
-                        metrics.precision(q_results_labeled.groupby('query').head(50)), \
+                        metrics.precision(q_results_labeled),\
+                        metrics.precision(q_results_labeled.groupby('query').head(5)),\
+                        metrics.precision(q_results_labeled.groupby('query').head(10)),\
+                        metrics.precision(q_results_labeled.groupby('query').head(50)),\
+
                         metrics.recall(q_results_labeled, q2n_relevant)
                     logging.debug(f"{engine_module} results produced average precision of {prec}.")
                     logging.debug(f"{engine_module} results produced average precision@5 of {p5}.")
@@ -186,11 +192,17 @@ if __name__ == '__main__':
                     if recall < 0 or recall > 1:
                         logging.error(f"The average recall for {engine_module} is out of range [0,1].")
 
-                if engine_module == 'search_engine_best' and \
-                        test_file_exists('idx_bench.pkl'):
-                    logging.info('idx_bench.pkl found!')
-                    engine.load_index('idx_bench.pkl')
-                    logging.info('Successfully loaded idx_bench.pkl using search_engine_best.')
+
+                if engine_module == 'search_engine_best':
+                    paths = ['idx_bench.pkl', os.path.join(model_dir, 'idx_bench.pkl')]
+                    idx_path = next((p for p in paths if os.path.exists(p)), None)
+                    if idx_path is not None:
+                        logging.info(f'{idx_path} found!')
+                        engine.load_index(idx_path)
+                        logging.info('Successfully loaded idx_bench.pkl using search_engine_best.')
+                    else:
+                        logging.error(f'idx_bench.pkl cannot be found in the current directory or under {model_dir}.')
+
 
             except Exception as e:
                 logging.error(f'The following error occured while testing the module {engine_module}.')
