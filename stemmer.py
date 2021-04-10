@@ -1,6 +1,5 @@
 from nltk.stem import snowball
 
-
 class Stemmer:
     def __init__(self):
         self.stemmer = snowball.SnowballStemmer("english")

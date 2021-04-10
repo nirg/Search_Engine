@@ -1,10 +1,17 @@
 import os
 import shutil
 from pathlib import Path
+
 import pandas as pd
+from reader import ReadFile
+from configuration import ConfigClass
 from parser_module import Parse
 from indexer import Indexer
 from searcher import Searcher
+from thesaurus import Thesaurus
+from w2v import Word2Vec
+
+import utils
 
 
 # DO NOT CHANGE THE CLASS NAME
@@ -16,7 +23,8 @@ class SearchEngine:
         self._config = config
         self._parser = Parse(config)
         self._indexer = Indexer(config)
-        self._model = None
+        self._model = Word2Vec()
+        self._model_1 = Thesaurus()
 
     # DO NOT MODIFY THIS SIGNATURE
     # You can change the internal implementation as you see fit.
@@ -38,9 +46,13 @@ class SearchEngine:
             number_of_documents += 1
             # index the document data
             self._indexer.add_new_doc(parsed_document)
-        print('Finished parsing and indexing.')
+
         self._indexer.save_index("idx_bench")
 
+
+
+
+    # DO NOT MODIFY THIS SIGNATURE
     # You can change the internal implementation as you see fit.
     def load_index(self, fn):
         """
@@ -75,7 +87,17 @@ class SearchEngine:
             a list of tweet_ids where the first element is the most relavant
             and the last is the least relevant result.
         """
-        searcher = Searcher(self._parser, self._indexer, model=self._model)
+        searcher =Searcher(self._parser, self._indexer, model=self._model,model_1=self._model_1)
         return searcher.search(query)
+
+
+
+
+
+
+
+
+
+
 
 

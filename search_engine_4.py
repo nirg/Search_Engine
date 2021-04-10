@@ -1,10 +1,15 @@
 import os
 import shutil
 from pathlib import Path
+
 import pandas as pd
+from reader import ReadFile
+from configuration import ConfigClass
 from parser_module import Parse
 from indexer import Indexer
 from searcher import Searcher
+import utils
+from wordnet import WordNet
 
 
 # DO NOT CHANGE THE CLASS NAME
@@ -16,7 +21,7 @@ class SearchEngine:
         self._config = config
         self._parser = Parse(config)
         self._indexer = Indexer(config)
-        self._model = None
+        self._model = WordNet()
 
     # DO NOT MODIFY THIS SIGNATURE
     # You can change the internal implementation as you see fit.
@@ -77,5 +82,15 @@ class SearchEngine:
         """
         searcher = Searcher(self._parser, self._indexer, model=self._model)
         return searcher.search(query)
+
+
+
+
+
+
+
+
+
+
 
 

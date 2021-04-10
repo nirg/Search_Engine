@@ -1,10 +1,9 @@
-# DO NOT MODIFY CLASS NAME
+
 import pickle
 
 
 class Indexer:
-    # DO NOT MODIFY THIS SIGNATURE
-    # You can change the internal implementation as you see fit.
+
     def __init__(self, config):
         self.inverted_idx = {}
         self.postingDict = {}
@@ -12,8 +11,6 @@ class Indexer:
         self.to_remove = []
         self.postingDocs={}  # docs["2343211"]=[(term , tf),(),....]
 
-    # DO NOT MODIFY THIS SIGNATURE
-    # You can change the internal implementation as you see fit.
     def add_new_doc(self, document):
         """
         This function perform indexing process for a document object.
@@ -39,8 +36,6 @@ class Indexer:
             except:
                 print('problem with the following key {}'.format(term[0]))
 
-    # DO NOT MODIFY THIS SIGNATURE
-    # You can change the internal implementation as you see fit.
     def load_index(self, fn):
         """
         Loads a pre-computed index (or indices) so we can answer queries.
@@ -58,9 +53,6 @@ class Indexer:
         object_file = pickle.load(file)
         return object_file
 
-
-    # DO NOT MODIFY THIS SIGNATURE
-    # You can change the internal implementation as you see fit.
     def save_index(self, fn):
         """
         pkl object ->[inverted_idx,posting_data,posting_document]
@@ -81,8 +73,6 @@ class Indexer:
             pickle.dump(dict_lst, f,protocol=pickle.HIGHEST_PROTOCOL)
         f.close()
 
-    # feel free to change the signature and/or implementation of this function 
-    # or drop altogether.
     def _is_term_exist_post(self, term):
         """
         Checks if a term exist in the dictionary.
@@ -97,8 +87,6 @@ class Indexer:
 
         return term in self.inverted_idx
 
-    # feel free to change the signature and/or implementation of this function 
-    # or drop altogether.
     def get_term_posting_list(self, term):
         """
         Return the posting list from the index for a term.

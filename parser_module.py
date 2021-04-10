@@ -1,7 +1,6 @@
 import math
 from nltk.corpus import stopwords
 import re
-
 from document import Document
 from stemmer import Stemmer
 
@@ -18,7 +17,13 @@ class Parse:
         self.global_dict = {}  #value=number of docs
         self.post_dict = {}  # key="word",value=[parquet name,index in parquet,tweet id,frequency in tweet,location in tweet,tf]
         self.entities = {}
+        self.path_stop_words = ['RT',"rt", 'tweet', 'www', 'http', 'https','WWW']
+        self.corona_list = ["cov",'corona', 'coronavirus', 'covid','covid19', 'covid 19', 'corona virus', 'virus corona', 'corona_virus', 'virus_corona',"virus"]
         self.config=config
+        self.trump = ["donald","donald trump", "trump donald", "president","trump_donald","donald_trump","trump-donald","donald-trump"]
+        self.stemmer=None
+        if self.config.toStem:
+            self.stemmer = Stemmer()
 
     def parse_sentence(self, sentence):
         if (sentence == None):
@@ -45,13 +50,6 @@ class Parse:
         term_dict = {}
         url = self.parse_url(url)
         tokenized_text=self.tokenized_parse(full_text)+url
-        try:
-            if self.config.toStem:
-                stem=Stemmer()
-                for i in range(len(tokenized_text)):
-                    tokenized_text[i]=stem.stem_term(tokenized_text[i])
-        except:
-            pass
 
         doc_length = len(tokenized_text)  # after text operations.
         unique_words=set()
@@ -658,10 +656,14 @@ class Parse:
         tokenized_text = full_text.split(' ')
         tokenized_text_copy=[]
         for term in tokenized_text:
+            if term.lower() in self.trump:
+                tokenized_text_copy.append("trump")
+                tokenized_text[tokenized_text.index(term)] = "trump"
+                continue
             tokenized_text_copy.append(term)
 
         for i in tokenized_text:
-            if i.lower() in self.stop_words or i.startswith("\n") or i.startswith("https") or len(i)<2:#remove from original
+            if i.lower() in self.stop_words or i in self.path_stop_words or i.startswith("\n") or i.startswith("https") or len(i)<2:#remove from original
                 tokenized_text_copy.remove(i)
                 continue
             idx = tokenized_text_copy.index(i)
@@ -681,6 +683,14 @@ class Parse:
         tokenized_text = self.percent_parse(tokenized_text)
         # save entity
         self.find_entities(tokenized_text)
+
+        try:
+            if self.stemmer!=None:
+                for i in range(len(tokenized_text)):
+                    tokenized_text[i] = self.stemmer.stem_term(tokenized_text[i])
+        except:
+            pass
+
         return tokenized_text
 
     def get_entity_dict(self):
